@@ -6,8 +6,6 @@ from collections import defaultdict
 from collections import Counter
 import random
 import bisect
-import time
-import cProfile
 import os.path
 import json
 
@@ -25,16 +23,7 @@ def get_counts(file, n):
                 curr = int(parts[n])
                 count = int(parts[-1])
                 ngrams[prev][curr] += count
-    # print(ngrams[ngrams.keys()[0]])
     return ngrams
-
-# # def find_blank(probs_dict):
-# #     for gram, dist in probs_dict.items():
-# #         if dist == {}:
-# #             print(gram, dist)
-# #             break
-# #     else:
-# #         print("None found!")
 
 def get_probs(counts):
     """Create a probability dictionary given a counts dictionary."""
@@ -43,7 +32,6 @@ def get_probs(counts):
         total_counts = float(sum(counts[prev].values()))
         for curr in counts[prev]:
             prob = counts[prev][curr] / total_counts
-            # print(prob)
             probs_dict[prev][curr] = prob
     return probs_dict
 
@@ -57,7 +45,6 @@ def accumulate(lst):
 def sample_note(dist_dict):
     """Given a distribution dictionary, generate the next note."""
     # TODO: Add constraints for lowest & highest notes
-    # print("dist: " + str(dist_dict))
     notes, probs = zip(*dist_dict.items())
     acc_probs = list(accumulate(probs))
     rand = random.random() * acc_probs[-1]
@@ -83,12 +70,10 @@ def main():
         probs = get_probs(counts)
         with open('./data/probs.json', 'w') as outfile:
             json.dump(probs, outfile)
-        # print(probs)
 
     with open('./data/probs.json', 'r') as infile:
         probs_dict = json.load(infile, encoding='utf-8')
 
-    # print(probs_dict)
     start_int = C4
     melody = []
     fluidsynth.init("/usr/share/sounds/sf2/FluidR3_GM.sf2", "alsa")
@@ -104,8 +89,6 @@ def main():
         print(next_note)
         fluidsynth.play_Note(next_note)
         time.sleep(.2)
-
-    print(melody)
 
 if __name__ == '__main__':
     main()
